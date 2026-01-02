@@ -124,9 +124,13 @@ def login():
             return redirect(url_for('login'))
         try:
             filename, path = save_base64_image(face_data, prefix='login')
+            print("done 126")
             image = face_recognition.load_image_file(path)
+            print("done 128")
             encs = face_recognition.face_encodings(image)
+            print("done 130")
             os.remove(path)    
+            print("done 132")
             if not encs:
                 flash('لم يتم العثور على وجه واضح في الصورة. حاول مجددًا.', 'danger')
                 return redirect(url_for('login'))
