@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>حسابي البنكي</title>
+
+    <style>
+        body {
+            background: #f0f0f0;
+            font-family: sans-serif;
+            direction: rtl;
+            text-align: center;
+        }
+
+        .container {
+            width: 350px;
+            background: white;
+            margin: 60px auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        h2 {
+            margin-top: 25px;
+            color: #444;
+            font-size: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            background: #4285f4;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #3367d6;
+        }
+
+        .balance-box {
+            background: #eee;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>حسابي البنكي</h1>
+
+        <div class="balance-box">
+
+            <b>رقم الهاتف:</b> {{ user.phone }} <br>
+            <b>الرصيد الحالي:</b> {{ user.balance }}
+        </div>
+
+
+        <div class="section">
+            <h2>إيداع مبلغ</h2>
+            <form action="/deposit" method="post">
+                <input type="number" step="0.01" name="amount" placeholder="المبلغ المراد إيداعه">
+                <button type="submit">إيداع</button>
+            </form>
+        </div>
+
+
+        <div class="section">
+            <h2>تحويل لشخص آخر</h2>
+            <form action="/transfer" method="post">
+                <input type="text" name="phone" placeholder="رقم هاتف المستلم">
+                <input type="number" step="0.01" name="amount" placeholder="المبلغ المراد تحويله">
+                <button type="submit">تحويل</button>
+            </form>
+        </div>
+
+
+        <div class="section">
+            <h2>دفع إلكتروني</h2>
+            <form action="/pay" method="post">
+                <input type="number" step="0.01" name="amount" placeholder="مبلغ الدفع">
+                <button type="submit">دفع</button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
