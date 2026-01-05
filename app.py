@@ -12,7 +12,8 @@ import base64
 from io import BytesIO
 import face_recognition
 from pyngrok import ngrok
-
+import dlib
+import cv2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -133,7 +134,13 @@ def login():
             image = Image.open(BytesIO(image_data))
             image = np.array(image)
             
-            encs = face_recognition.face_encodings(image,model='cnn')
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            detections = cnn_face_detector(rgb_image, 1)
+            if len(detections) == 0:
+                flash('No complete face detected or face is covered', 'danger')
+                return redirect(url_for('login'))
+                
+            encs = face_recognition.face_encodings(image)
             
             if not encs:
                 flash('.لم يتم العثور على وجه في الصورة. حاول مجدداً', 'danger')
