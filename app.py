@@ -147,7 +147,8 @@ def login():
             else:
                 flash('خطأ: الوجه غير مطابق: ' , 'danger')
                 return redirect(url_for('login'))
-        except :
+        except Exception as e:
+            print(e)
             flash('حدث خطأ أثناء التحقق: ', 'danger')
             return redirect(url_for('login'))
 
