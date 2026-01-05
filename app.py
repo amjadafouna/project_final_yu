@@ -131,13 +131,16 @@ def login():
             image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             image = image[:, :, ::-1]
             encs = face_recognition.face_encodings(image)
+            print("134")
             #image = face_recognition.load_image_file(path)
             if not encs:
                 flash('لم يتم العثور على وجه واضح في الصورة. حاول مجددًا.', 'danger')
                 return redirect(url_for('login'))
             login_encoding = encs[0]
             registered_encoding = user.get_encoding()
+            print("141")
             match = compare_encodings(registered_encoding, login_encoding, tolerance=0.4)
+            print("143")
             if match:
                 session['user_id'] = user.id
                 return redirect(url_for('bank'))
