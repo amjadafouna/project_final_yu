@@ -133,7 +133,7 @@ def login():
             image = Image.open(BytesIO(image_data))
             image = np.array(image)
             
-            encs = face_recognition.face_encodings(image)
+            encs = face_recognition.face_encodings(image,model='cnn')
             
             if not encs:
                 flash('.لم يتم العثور على وجه في الصورة. حاول مجدداً', 'danger')
