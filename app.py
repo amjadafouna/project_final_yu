@@ -158,7 +158,42 @@ def login():
             return redirect(url_for('login'))
             
     return render_template('login.html')
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        dob = request.form.get('dob', '').strip()
+        phone = request.form.get('phone', '').strip()
+        face_data = request.form.get('face_image', None)
 
+        if not (name and dob and phone and face_data):
+            flash('الرجاء ملء الحقول المطلوبة .', 'danger')
+            return redirect(url_for('register'))
+        if User.query.filter_by(phone=phone).first():
+            flash('هذا الرقم مسجل مسبقًا. حاول تسجيل الدخول بدلاً من ذلك.', 'warning')
+            return redirect(url_for('login'))
+            
+        try:
+            filename, path = save_base64_image(face_data, prefix='reg')            
+            image = face_recognition.load_image_file(path)
+            encs = face_recognition.face_encodings(image)
+            if not encs:
+                flash('لم يتم العثور على وجه واضح في الصورة. حاول مجددًا.', 'danger')
+                return redirect(url_for('register'))
+            if len(encs)>1:
+                flash('يوجد اكثر من وجه بالصورة', 'danger')
+                return redirect(url_for('register'))    
+                
+            encoding = encs[0].tolist()
+            user = User(name=name, dob=dob, phone=str(phone), balance=0 , face_encoding_json=json.dumps(encoding))
+            db.session.add(user)
+            db.session.commit()
+            flash('تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.', 'success')
+            return redirect(url_for('login'))
+        except :
+            flash('حدث خطأ: ', 'danger')
+            return redirect(url_for('register'))
+    return render_template('register.html')
 @app.route('/bank')
 def bank():
     user_id = session.get('user_id')
