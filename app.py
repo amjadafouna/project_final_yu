@@ -12,7 +12,7 @@ import base64
 from io import BytesIO
 import face_recognition
 from pyngrok import ngrok
-
+import mediapipe as mp
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
@@ -119,44 +119,46 @@ def login():
         phone = request.form.get('phone', '').strip()
         face_data = request.form.get('face_image', None)
         user = User.query.filter_by(phone=phone).first()
-        
         if not user:
-            flash('.الرقم غير موجود', 'danger')
+            flash('الرقم غير موجود.','danger')
             return redirect(url_for('register'))
-            
         if not face_data:
-            flash('.الرجاء التقاط صورة الوجه', 'danger')
+            flash('الرجاء التقاط صورة الوجه.', 'danger')
             return redirect(url_for('login'))
-            
+
         try:
-            
             image_data = base64.b64decode(face_data.split(',')[1])
-            image = Image.open(BytesIO(image_data))
-            image = np.array(image)
-            
-            encs = face_recognition.face_encodings(image)
-            
-            if not encs:
-                flash('.لم يتم العثور على وجه في الصورة. حاول مجدداً', 'danger')
-                return redirect(url_for('login'))
-                
-            login_encoding = encs[0]
+            image = np.array(Image.open(BytesIO(image_data)))[:, :, ::-1]
+
+            mp_face = mp.solutions.face_mesh
+            with mp_face.FaceMesh(static_image_mode=True) as face_mesh:
+                results = face_mesh.process(image)
+                if not results.multi_face_landmarks:
+                    flash('No face detected in the image.', 'danger')
+                    return redirect(url_for('login'))
+
+                lm = results.multi_face_landmarks[0].landmark
+                face_visible = all(p.visibility > 0.5 for p in lm)
+                if not face_visible:
+                    flash("Some part of the face is covered", "danger")
+                    return redirect(url_for('login'))
+
+            login_encoding = face_recognition.face_encodings(image)[0]
             registered_encoding = user.get_encoding()
-            
-            match = compare_encodings(registered_encoding, login_encoding, tolerance=0.6)
-            
+            match = compare_encodings(registered_encoding, login_encoding, tolerance=0.4)
+
             if match:
                 session['user_id'] = user.id
                 return redirect(url_for('bank'))
             else:
-                flash('خطأ: الوجه غير مطابق', 'danger')
+                flash('خطأ: الوجه غير مطابق.', 'danger')
                 return redirect(url_for('login'))
-                
+
         except Exception as e:
             print(e)
-            flash('حدث خطأ أثناء التحقق', 'danger')
+            flash('حدث خطأ أثناء التحقق.', 'danger')
             return redirect(url_for('login'))
-            
+
     return render_template('login.html')
 @app.route('/register', methods=['GET', 'POST'])
 def register():
