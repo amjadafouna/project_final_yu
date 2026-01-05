@@ -130,7 +130,8 @@ def login():
             nparr = np.frombuffer(img_bytes, np.uint8)
             image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             image = image[:, :, ::-1]
-            encs = face_recognition.face_encodings(image)
+            face_locations = face_recognition.face_locations(image)
+            encs = face_recognition.face_encodings(image,face_locations)
             print("134")
             #image = face_recognition.load_image_file(path)
             if not encs:
