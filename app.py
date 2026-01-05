@@ -124,32 +124,50 @@ def login():
         if not face_data:
             flash('الرجاء التقاط صورة الوجه.', 'danger')
             return redirect(url_for('login'))
-        try:
-            #filename, path = save_base64_image(face_data, prefix='login')
+        try:   
             image_data = base64.b64decode(face_data.split(',')[1])
             image = Image.open(BytesIO(image_data))
             image = np.array(image)
-            encs = face_recognition.face_encodings(image)
-            #encs = face_recognition.face_encodings(image,face_locations)
-            print("134")
-            #image = face_recognition.load_image_file(path)
-            if not encs:
-                flash('لم يتم العثور على وجه واضح في الصورة. حاول مجددًا.', 'danger')
+            face_landmarks_list = face_recognition.face_landmarks(image)
+            parts_to_check = [
+                "left_eye", "right_eye",
+                "left_eyebrow", "right_eyebrow",
+                "nose_bridge", "nose_tip",
+                "top_lip", "bottom_lip",
+                "chin"]
+      
+            if not face_landmarks_list:
+                flash('لم يتم العثور على وجه واضح في الصورة', 'danger')
                 return redirect(url_for('login'))
-            login_encoding = encs[0]
+
+            first_covered = None
+            for landmarks in face_landmarks_list:
+                for part in parts_to_check:
+                    if part not in landmarks or not landmarks[part]:
+                        first_covered = part
+                        break
+                if first_covered:
+                    break
+
+            if first_covered:
+                flash(f'{first_covered} is covered','danger')
+                return redirect(url_for('login'))
+
+            login_encoding = face_recognition.face_encodings(image)[0]
             registered_encoding = user.get_encoding()
-            print("141")
+
             match = compare_encodings(registered_encoding, login_encoding, tolerance=0.4)
-            print("143")
+
             if match:
                 session['user_id'] = user.id
                 return redirect(url_for('bank'))
             else:
-                flash('خطأ: الوجه غير مطابق: ' , 'danger')
+                flash('خطأ: الوجه غير مطابق.', 'danger')
                 return redirect(url_for('login'))
+
         except Exception as e:
             print(e)
-            flash('حدث خطأ أثناء التحقق: ', 'danger')
+            flash('حدث خطأ أثناء التحقق.', 'danger')
             return redirect(url_for('login'))
 
     return render_template('login.html')
