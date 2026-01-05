@@ -148,7 +148,7 @@ def login():
                         break
                 if first_covered:
                     break
-
+            print("151")
             if first_covered:
                 flash(f'{first_covered} is covered','danger')
                 return redirect(url_for('login'))
