@@ -8,7 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Numeric
 from PIL import Image
 import numpy as np
-import cv2
+import base64
+from io import BytesIO
 import face_recognition
 from pyngrok import ngrok
 
@@ -125,13 +126,11 @@ def login():
             return redirect(url_for('login'))
         try:
             #filename, path = save_base64_image(face_data, prefix='login')
-            face_data = face_data.split(",")[1]
-            img_bytes = base64.b64decode(face_data)
-            nparr = np.frombuffer(img_bytes, np.uint8)
-            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            image = image[:, :, ::-1]
-            face_locations = face_recognition.face_locations(image)
-            encs = face_recognition.face_encodings(image,face_locations)
+            image_data = base64.b64decode(face_data.split(',')[1])
+            image = Image.open(BytesIO(image_data))
+            image = np.array(image)
+            encs = face_recognition.face_encodings(image)
+            #encs = face_recognition.face_encodings(image,face_locations)
             print("134")
             #image = face_recognition.load_image_file(path)
             if not encs:
