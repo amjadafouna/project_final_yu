@@ -135,7 +135,7 @@ def login():
                 "nose_bridge", "nose_tip",
                 "top_lip", "bottom_lip",
                 "chin"]
-      
+            print(face_landmarks_list)
             if not face_landmarks_list:
                 flash('لم يتم العثور على وجه واضح في الصورة', 'danger')
                 return redirect(url_for('login'))
