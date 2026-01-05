@@ -72,6 +72,21 @@
             margin-top: 20px;
             padding-bottom: 10px;
         }
+        .logout-btn {
+        width: 95%;
+        padding: 10px;
+        background: #e53935;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+    .logout-btn:hover {
+        background: #c62828;
+    }
     </style>
 </head>
 
@@ -114,7 +129,11 @@
                 <button type="submit">دفع</button>
             </form>
         </div>
-
+        <div class="section">
+           <form action="{{ url_for('logout') }}" method="get">
+              <button type="submit" class="logout-btn">تسجيل الخروج</button>
+           </form>
+         </div> 
     </div>
 
 </body>
