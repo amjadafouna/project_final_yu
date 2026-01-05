@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Numeric
 from PIL import Image
 import numpy as np
+import cv2
 import face_recognition
 from pyngrok import ngrok
 
@@ -123,14 +124,14 @@ def login():
             flash('الرجاء التقاط صورة الوجه.', 'danger')
             return redirect(url_for('login'))
         try:
-            filename, path = save_base64_image(face_data, prefix='login')
-            print("done 126")
-            image = face_recognition.load_image_file(path)
-            print("done 128")
+            #filename, path = save_base64_image(face_data, prefix='login')
+            face_data = face_data.split(",")[1]
+            img_bytes = base64.b64decode(face_data)
+            nparr = np.frombuffer(img_bytes, np.uint8)
+            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            image = image[:, :, ::-1]
             encs = face_recognition.face_encodings(image)
-            print("done 130")
-            os.remove(path)    
-            print("done 132")
+            #image = face_recognition.load_image_file(path)
             if not encs:
                 flash('لم يتم العثور على وجه واضح في الصورة. حاول مجددًا.', 'danger')
                 return redirect(url_for('login'))
