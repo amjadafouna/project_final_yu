@@ -22,7 +22,7 @@ app = Flask(__name__)
 app.secret_key = 'secretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'users.db')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+cnn_face_detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
 db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
